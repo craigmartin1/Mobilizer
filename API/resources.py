@@ -91,5 +91,26 @@ class RegisterMobilizer(Resource):
 
 class RegisterMobilizee(Resource):
     def post(self):
+        data = register_mobilizer_parser.parse_args()
+        fname = data["fname"]
+        lname = data["lname"]
+        email = data["email"]
+        phone = data["phone"]
+        address = data["address"]
+        mobilizee = Mobilizee(lname, fname, email, phone, address)
+        db.session.add(mobilizee)
+        db.session.commit()
+        return {"Message": "Mobilizee Registered"}
 
-class
+class MassRegistration(Resource):
+    def post(self):
+        file = request.files['mobilizee_input']
+        df = pd.read_csv(file)
+        for index,row in df.iterrows():
+            mobilizee = Mobilizee(row["lname"], row["fname"], row["email"], row["phone"]. row["address"])
+            db.session.add(mobilizee)
+        db.session.commit()
+        return {"Message": "Mobilizees Registered"}
+
+
+
