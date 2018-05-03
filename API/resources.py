@@ -84,10 +84,21 @@ class RegisterMobilizer(Resource):
         password = Mobilizer.hash_pwd(data["password"])
         coordinator_id = data["coordinator"]
         coordinator = Coordinator.query.filter(Coordinator.coordinator_id==coordinator_id).first()
-        mobilizer = Mobilizer(name, coordinator)
+        mobilizer = Mobilizer(name, username, email, phone, password, coordinator_id)
         db.session.add(mobilizer)
         db.session.commit()
+        mobilizer = Mobilizer.query.filter(Mobilizer.username == username).first()
+        coordinator.mobilizers.append(mobilizer)
         return {"Message":"Mobilizer Registered"}
+
+class ChangePasswordMobilizer(Resource):
+    def post(self):
+        data = password_parser.parse_args()
+        mobilizer_id = data["mobilizer_id"]
+        new_password = data["password"]
+        mobilizer = Mobilizer.query.filter(Mobilizer.mobilizer_id==mobilizer_id).first()
+        mobilizer.password = Mobilizer.generate_hash(password)
+        db.session.commit()
 
 class RegisterMobilizee(Resource):
     def post(self):
@@ -112,5 +123,59 @@ class MassRegistration(Resource):
         db.session.commit()
         return {"Message": "Mobilizees Registered"}
 
+class RemoveMobilizer(Resource):
+    def post(self):
+        data = removal_parser.parse_args()
+        mobilizer_id = data["mobilizer_id"]
+        mobilizer = Mobilizer.query.filter(Mobilizer.mobilizer_id==mobilizer_id).first()
+        mobilizer.coordinator.uncategorized_mobilizees.extend(mobilizer.mobilizees)
+        db.session.delete(mobilizer)
+        db.session.commit()
+        return {"Message": "Mobilizer Removed"}
 
+class RemoveMobilizee(Resource):
+    def post(self):
+        data= remove_mobilizee_parser.parse_args()
+        mobilizee_id = data["mobilizee_id"]
+        mobilizer_id = data["mobilizer_id"]
+        mobilizer = Mobilizer.query.filter(Mobilizer.mobilizer_id==mobilizer_id).first()
+        mobilizee = Mobilizee.query.filter(Mobilizee.mobilizee_id==mobilizee_id).first()
+        mobilizer.mobilizees.remove(mobilizee)
+        mobilizer.coordinator.uncategorized_mobilizees.append(mobilizee)
+        return {"Message": "Mobilizee removed"}
 
+class DeleteMobilizee(Resource):
+    def post(self):
+        data = delete_mobilizee_parser.parse_args()
+        mobilizee_id = data["mobilizee_id"]
+        mobilizee = Mobilizee.query.filter(Mobilizee.mobilizee_id==mobilizee_id).first()
+        db.session.delete(mobilizee)
+        db.commit()
+        return {"Message": "Mobilizee deleted"}
+
+class Login(Resource):
+    def post(self):
+        data = user_parser.parse_args()
+        username = data["username"]
+        mobilizer = Mobilizer.query.filter(Mobilizer.username==username).first()
+        coordinator = Coordinator.query.filter(Coordinator.username==username).first()
+        if(mobilizer):
+            if(Mobilizer.verify_hash(data["password"], mobilizer.password)):
+                session['mobilizer_id'] = mobilizer.mobilizer_id
+                return {
+                    'message': 'Logged in as {}'.format(mobilizer.username),
+                    'user_type': '{}'.format(type(mobilizer).__name__),
+                    'id': '{}'.format(mobilizer.mobilizer_id)
+                }
+            else:
+                return {'err': 'Username or password not recognized'}
+        elif(coordinator):
+            if (Coordinator.verify_hash(data["password"], coordinator.password)):
+                session['coordinator_id'] = coordinator.coordinator_id
+                return {
+                    'message': 'Logged in as {}'.format(coordinator.username),
+                    'user_type': '{}'.format(type(coordinator).__name__),
+                    'id': '{}'.format(coordinator.coordinator_id)
+                }
+            else:
+                return {'err': 'Username or password not recognized'}

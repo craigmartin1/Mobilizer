@@ -14,6 +14,8 @@ class Mobilizer(db.Model):
     password = db.Column(db.String(120), nullable = False)
     email = db.Column(db.Text, unique = True, nullable=False)
     phone = db.Column(db.Text, unique=True, nullable=False)
+    coordinator_id = db.Column(db.Integer, db.ForeignKey('coordinator.coordinator_id'))
+    mobilizees = db.relationship("Mobilizee", backref="mobilizer")
 
     @staticmethod
     def generate_hash(password):
@@ -27,12 +29,13 @@ class Mobilizer(db.Model):
         db.session.add(self)
         db.session.commit()
 
-    def __init__(self, name, username, email, phone, password):
+    def __init__(self, name, username, email, phone, password, coordinator_id):
         self.name = name
         self.username = username
         self.email = email
         self.phone = phone
         self.password = password
+        self.coordinator_id = coordinator_id
 
     def __repr__(self):
         return '<Mobilizer {}>'.format(self.mobilizer_id)
@@ -44,7 +47,8 @@ class Mobilizee(db.Model):
     email = db.Column(db.Text, unique=True, nullable=False)
     phone = db.Column(db.Text, nullable=False)
     address = db.Column(db.Text, nullable=False)
-    #NOTE RELATIONSHIP
+    notes = db.relationship("Note", backref="mobilizee")
+    mobilizer_id = db.Column(db.Integer, db.ForeignKey('mobilizer.mobilizer_id'))
 
     def __init__(self, lname, fname, email, phone, address):
         self.lname = lname
@@ -55,3 +59,29 @@ class Mobilizee(db.Model):
 
     def __repr__(self):
         return '<Mobilizee {}>'.format(self.mobilizer_id)
+
+class Note(db.Model):
+    note_id = db.Column(db.Integer, primary_key=True)
+    mobilizee_id = db.Column(db.Integer, db.ForeignKey('mobilizee.mobilizee_id'))
+    content = db.Column(db.Text, nullable=False)
+
+    def __init__(self, mobilizee, content):
+        self.mobilizee = mobilizee
+        self.content = content
+
+    def __repr__(self):
+        return '<Note {}>'.format(self.mobilizer_id)
+
+class Coordinator(db.Model):
+    coordinator_id = db.Column(db.Integer, primary_key=True)
+    mobilizers = db.relationship("Mobilizer", backref="coordinator")
+    username = db.Column(db.String(120), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable = False)
+
+    @staticmethod
+    def generate_hash(password):
+        return sha256.hash(password)
+
+    @staticmethod
+    def verify_hash(password):
+        return sha256.verify(password, hash)
