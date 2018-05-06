@@ -13,7 +13,7 @@ class Mobilizer(db.Model):
     username = db.Column(db.String(120), unique = True, nullable=False)
     password = db.Column(db.String(120), nullable = False)
     email = db.Column(db.Text, unique = True, nullable=False)
-    phone = db.Column(db.Text, unique=True, nullable=False)
+    phone = db.Column(db.Text, nullable=False)
     coordinator_id = db.Column(db.Integer, db.ForeignKey('coordinator.coordinator_id'))
     mobilizees = db.relationship("Mobilizee", backref="mobilizer")
 
@@ -22,7 +22,7 @@ class Mobilizer(db.Model):
         return sha256.hash(password)
 
     @staticmethod
-    def verify_hash(password):
+    def verify_hash(password, hash):
         return sha256.verify(password, hash)
 
     def save_to_db(self):
@@ -56,6 +56,7 @@ class Mobilizee(db.Model):
         self.email = email
         self.phone = phone
         self.address = address
+        self.notes = []
 
     def __repr__(self):
         return '<Mobilizee {}>'.format(self.mobilizer_id)
@@ -65,8 +66,8 @@ class Note(db.Model):
     mobilizee_id = db.Column(db.Integer, db.ForeignKey('mobilizee.mobilizee_id'))
     content = db.Column(db.Text, nullable=False)
 
-    def __init__(self, mobilizee, content):
-        self.mobilizee = mobilizee
+    def __init__(self, mobilizee_id, content):
+        self.mobilizee_id = mobilizee_id
         self.content = content
 
     def __repr__(self):
@@ -77,6 +78,11 @@ class Coordinator(db.Model):
     mobilizers = db.relationship("Mobilizer", backref="coordinator")
     username = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable = False)
+    removal_requests = db.relationship("Request", backref="request_coordinator")
+
+    def __init__(self,  username, password):
+        self.username = username
+        self.password = password
 
     @staticmethod
     def generate_hash(password):
@@ -85,3 +91,12 @@ class Coordinator(db.Model):
     @staticmethod
     def verify_hash(password):
         return sha256.verify(password, hash)
+
+class Request(db.Model):
+    request_id = db.Column(db.Integer, primary_key=True)
+    mobilizee_id = db.Column(db.Integer, db.ForeignKey('mobilizee.mobilizee_id'))
+    coordinator = db.Column(db.Integer, db.ForeignKey('coordinator.coordinator_id'))
+
+    def __init__(self, mobilizee_id, coordinator_id):
+        self.mobilizee_id = mobilizee_id
+        self.coordinator = coordinator_id

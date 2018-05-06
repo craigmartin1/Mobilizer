@@ -1,28 +1,87 @@
-import flask
+import os
+from flask import *
 from flask_restful import Api
-app = Flask(__name__)
-api = Api(app)
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy import *
+from Models.models import db
 
+engine = create_engine('sqlite:///mobilizer.db')
+metadata = MetaData()
+
+app = Flask(__name__)
+app.register_blueprint(Blueprint('static_bp', __name__, static_folder='assets', static_url_path=''), url_prefix='/assets')
+
+api = Api(app)
+app.config.update(dict(
+    DEBUG=True,
+    SECRET_KEY='development_key',
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///' + os.path.join(app.root_path, 'mobilizer.db')
+))
 app.config.from_object(__name__)
 app.config.from_envvar('CHAT_CONFIG', silent=True)
+db.init_app(app)
+
 
 #Resource API AUTH
 from API import resources
-from flask_jwt_extended import JWTManager
-app.config['JWT_SECRET_KEY'] = 'jwt-secret-string'
-jwt = JWTManager(app)
 
-api.add_resource(resources.seeMobilizees, '/mobilizees')
-api.add_resource(resources.AddNote, '/addnote')
-api.add_resource(resources.RequestRemoval, '/removal')
-api.add_resource(resources.UpdateContact, '/update')
-api.add_resource(resources.Remove, '/remove')
-api.add_resource(resources.Assign, '/assign')
-api.add_resource(resources.SeeAll, '/see')
+api.add_resource(resources.SeeMobilizees, '/mobilizer/seeMobilizees')
+api.add_resource(resources.MakeNote, '/mobilizer/addnote')
+api.add_resource(resources.RequestRemoval, '/mobilizer/removal')
+api.add_resource(resources.TestContact, '/test')
+api.add_resource(resources.UpdateContact, '/mobilizer/update')
+api.add_resource(resources.AssignMobilizees, '/coordinator/assign')
+api.add_resource(resources.RegisterMobilizer, '/coordinator/register_mobilizer')
+api.add_resource(resources.ChangePasswordMobilizer, '/mobilizer/change_password')
+api.add_resource(resources.RegisterMobilizee, '/coordinator/register_mobilizee')
+api.add_resource(resources.MassRegistration, '/coordinator/mass_register')
+api.add_resource(resources.RemoveMobilizer, '/coordinator/remove_mobilizer')
+api.add_resource(resources.RemoveMobilizee, '/coordinator/remove_mobilizee')
+api.add_resource(resources.DeleteMobilizee, '/coordinator/delete_mobilizee')
+api.add_resource(resources.Login, '/login')
+
+@app.cli.command('initdb')
+def initdb_command():
+    db.drop_all()
+    db.create_all()
+
+    con = engine.connect()
+    con.execute("""INSERT INTO coordinator
+                    VALUES (
+                        1,
+                        'username',
+                        '$pbkdf2-sha256$29000$X6sVIiREaG0NQSjl3BtjzA$WhUNyD7BYxY.fHbbpppVxrj.NRbYm1w1F7LHXb6eavQ'
+                    );""")
+
+    con.execute("""INSERT INTO mobilizer
+                        VALUES (
+                            1,
+                            'Testing Lastname',
+                            'username',
+                            '$pbkdf2-sha256$29000$X6sVIiREaG0NQSjl3BtjzA$WhUNyD7BYxY.fHbbpppVxrj.NRbYm1w1F7LHXb6eavQ',
+                            'testing@gmail.com',
+                            '5103044525',
+                            1
+                        );""")
+    con.execute("""INSERT INTO mobilizer
+                            VALUES (
+                                2,
+                                'Firstname Lastname2',
+                                'username2',
+                                 '$pbkdf2-sha256$29000$X6sVIiREaG0NQSjl3BtjzA$WhUNyD7BYxY.fHbbpppVxrj.NRbYm1w1F7LHXb6eavQ',
+                                'testing2@gmail.com',
+                                '5103044524',
+                                1
+                            );""")
+
+
+
 #Routes
 @app.route('/')
 def main_page():
-    return make_response(render_template('index.html'))
+    print("MAIN")
+    #return make_response(render_template('index.html'))
+    return "MAIN"
 
 @app.errorhandler(404)
 def page_not_found(e):
