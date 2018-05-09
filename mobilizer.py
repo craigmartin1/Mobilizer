@@ -79,9 +79,7 @@ def initdb_command():
 #Routes
 @app.route('/')
 def main_page():
-    print("MAIN")
-    #return make_response(render_template('index.html'))
-    return "MAIN"
+    return make_response(render_template('index.html'))
 
 @app.errorhandler(404)
 def page_not_found(e):
