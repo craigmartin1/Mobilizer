@@ -1,5 +1,6 @@
 import os
 from flask import *
+from flask_cors import CORS
 from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import *
@@ -8,7 +9,8 @@ from Models.models import db
 engine = create_engine('sqlite:///mobilizer.db')
 metadata = MetaData()
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='mobilizer-app/build')
+CORS(app)
 app.register_blueprint(Blueprint('static_bp', __name__, static_folder='assets', static_url_path=''), url_prefix='/assets')
 
 api = Api(app)
@@ -38,6 +40,8 @@ api.add_resource(resources.MassRegistration, '/coordinator/mass_register')
 api.add_resource(resources.RemoveMobilizer, '/coordinator/remove_mobilizer')
 api.add_resource(resources.RemoveMobilizee, '/coordinator/remove_mobilizee')
 api.add_resource(resources.DeleteMobilizee, '/coordinator/delete_mobilizee')
+api.add_resource(resources.UnattachedMobilizees, '/coordinator/unattached_mobilizees')
+api.add_resource(resources.SeeMobilizers, '/coordinator/see_mobilizers')
 api.add_resource(resources.Login, '/login')
 
 @app.cli.command('initdb')
@@ -75,15 +79,6 @@ def initdb_command():
                             );""")
 
 
-
-#Routes
-@app.route('/')
-def main_page():
-    return make_response(render_template('index.html'))
-
-@app.errorhandler(404)
-def page_not_found(e):
-    return redirect(url_for(main_page))
 
 if __name__ == '__main__':
     app.run()

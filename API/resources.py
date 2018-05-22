@@ -58,6 +58,22 @@ user_parser = reqparse.RequestParser()
 user_parser.add_argument('username')
 user_parser.add_argument('password')
 
+class UnattachedMobilizees(Resource):
+    pass
+
+class SeeMobilizers(Resource):
+    def get(self):
+        coordinator_id = 1
+        coordinator = Coordinator.query.filter(Coordinator.coordinator_id == coordinator_id).first()
+        mobilizer_list = []
+        for mobilizer in coordinator.mobilizers:
+            mobilizer_dict = {}
+            mobilizer_dict["id"] = mobilizer.mobilizer_id
+            mobilizer_dict["name"] = mobilizer.username
+            mobilizer_dict["phone"] = mobilizer.phone
+            mobilizer_dict["email"] = mobilizer.email
+            mobilizer_list.append(mobilizer_dict)
+        return mobilizer_list
 class SeeMobilizees(Resource):
     def get(self):
         mobilizer_id = 1

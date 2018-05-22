@@ -1,9 +1,9 @@
 import React from 'react';
-import classes from './Mobilizer.css';
+import './Mobilizer.css';
 
 const mobilizer = (props) => {
 	return (
-		<div className={classes.Mobilizer}>
+		<div className="Mobilizer">
 			<p><strong>{props.name}</strong></p>
 			<p>{props.email}</p>
 			<p>{props.phone}</p>
