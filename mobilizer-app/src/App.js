@@ -1,7 +1,10 @@
 import React, { Component } from 'react';
+import { BrowserRouter, Route, Link, withRouter } from 'react-router-dom';
 import './App.css';
 import Mobilizees from './components/Mobilizees/Mobilizees';
 import Mobilizers from './components/Mobilizers/Mobilizers';
+import Coordinator from './components/Coordinator/coordinator';
+import User from './components/User/User';
 import axios from 'axios';
 
 class App extends Component {
@@ -39,29 +42,13 @@ class App extends Component {
         });
     }
   }
-  removeMobilizerHandler = (id) =>{
-    axios.post('/coordinator/remove_mobilizer', {mobilizer_id:id}).catch(error => {
-          console.log(error);
-        });
-  }
+  
 
-  removeMobilizeeHandler = (id) =>{
-    axios.post('/mobilizer/remove_mobilizee', {mobilizee_id:id}).catch(error => {
-          console.log(error);
-        });
-  }
+  
 
-  deleteMobilizeeHandler = (id) =>{
-    axios.post('/coordinator/delete_mobilizee', {mobilizee_id:id}).catch(error => {
-          console.log(error);
-        });
-  }
+  
 
-  assignMobilizeeHandler = (mobilizee_id, mobilizer_id) => {
-    axios.post('/coordinator/assign', {mobilizees:mobilizee_id, mobilizer_id:parseInt(mobilizer_id)}).catch(error =>{
-      console.log(error);
-    });
-  }
+  
 
   state = {
     //role: props.role,
@@ -85,28 +72,21 @@ class App extends Component {
   }
 
   render() {
-    if(this.state.role === 'coordinator'){
-      console.log(this.state.mobilizers)
       return (
+        <BrowserRouter>
         <div className="App">
-          <Mobilizers mobilizers={this.state.mobilizers} removal_function={this.removeMobilizerHandler} />
-          <h1>Unattached Mobilizees</h1>
-          <Mobilizees mobilizees={this.state.mobilizees} removal_function={this.deleteMobilizeeHandler} assign_function={this.assignMobilizeeHandler} mobilizers={this.state.mobilizers}/>
-          <h1>Removal Requests</h1>
-          <Mobilizees mobilizees={this.state.removal_requests} removal_function={this.deleteMobilizeeHandler} />
-          {//Register Mobilzer button, goes to register route
-          //Register Mobilizee button, goes to register route
-        }
+          <p><Link to="/coordinator">Coordinator Test</Link></p>
+          <p><Link to="/mobilizer">Mobilizer Test</Link></p>
+          <Route path="/coordinator" render={(props) => (
+              <Coordinator mobilizers={this.state.mobilizers} mobilizees={this.state.mobilizees} removal_requests={this.state.removal_requests} />
+            )} />
+          <Route path="/mobilizer" render={(props) => (
+              <User mobilizees={this.state.mobilizees} />
+            )} />
         </div>
-      );
-    } else if(this.state.role === 'mobilizer'){
-      return (
-        <div className="App">
-          <Mobilizees mobilizees={this.state.mobilizees} removal_function={this.removeMobilizeeHandler} />
-        </div>
+        </BrowserRouter>
       );
     }
-  }
 }
 
 export default App;

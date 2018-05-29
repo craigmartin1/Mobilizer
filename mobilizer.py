@@ -89,12 +89,6 @@ def initdb_command():
                                     -1
                                 );""")
 
-    con.execute("""INSERT INTO request
-                                VALUES (
-                                    1,
-                                    2,
-                                    1
-                                );""")
 
 
 

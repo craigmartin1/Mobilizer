@@ -14,8 +14,8 @@ note_parser = reqparse.RequestParser()
 note_parser.add_argument('mobilizee_id', help='This field cannot be blank', required=True)
 note_parser.add_argument('note', help='This field cannot be blank', required=True)
 
-removal_parser = reqparse.RequestParser()
-removal_parser.add_argument('mobilizer_id', help='This field cannot be blank', required=True)
+request_removal_parser = reqparse.RequestParser()
+request_removal_parser.add_argument('mobilizee_id', help='This field cannot be blank', required=True)
 
 mobilizer_removal_parser = reqparse.RequestParser()
 mobilizer_removal_parser.add_argument('mobilizer_id', help='This field cannot be blank', required=True)
@@ -124,9 +124,9 @@ class MakeNote(Resource):
 
 class RequestRemoval(Resource):
     def post(self):
-        data = removal_parser.parse_args()
+        data = request_removal_parser.parse_args()
         mobilizee_id = data["mobilizee_id"]
-        mobilizer_id = session["mobilizer_id"]
+        mobilizer_id = 1
         mobilizer = Mobilizer.query.filter(Mobilizer.mobilizer_id==mobilizer_id).first()
         request = Request(mobilizee_id, mobilizer.coordinator.coordinator_id)
         db.session.add(request)
@@ -245,7 +245,7 @@ class MassRegistration(Resource):
 
 class RemoveMobilizer(Resource):
     def post(self):
-        data = removal_parser.parse_args()
+        data = mobilizer_removal_parser.parse_args()
         mobilizer_id = data["mobilizer_id"]
         db.session.query(Mobilizer).filter(Mobilizer.mobilizer_id==mobilizer_id).delete()
         db.session.commit()
