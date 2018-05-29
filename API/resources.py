@@ -59,7 +59,23 @@ user_parser.add_argument('username')
 user_parser.add_argument('password')
 
 class UnattachedMobilizees(Resource):
-    pass
+    def get(self):
+        mobilizees = Mobilizee.query.filter(Mobilizee.mobilizer_id == -1).all()
+        mobilizee_list = []
+        for mobilizee in mobilizees:
+            mobilizee_dict = {}
+            mobilizee_dict["id"] = mobilizee.mobilizee_id
+            mobilizee_dict['name'] = mobilizee.fname + " " + mobilizee.lname
+            mobilizee_dict["phone"] = mobilizee.phone
+            mobilizee_dict["email"] = mobilizee.email
+            mobilizee_dict["address"] = mobilizee.address
+            #note_list = []
+            #for note in mobilizee.notes:
+             #   note_list.append({"content": note.content})
+            #note_list.reverse()
+            #mobilizee_dict["notes"] = note_list
+            mobilizee_list.append(mobilizee_dict)
+        return mobilizee_list
 
 class SeeMobilizers(Resource):
     def get(self):
@@ -87,11 +103,11 @@ class SeeMobilizees(Resource):
             mobilizee_dict["phone"] = mobilizee.phone
             mobilizee_dict["email"] = mobilizee.email
             mobilizee_dict["address"] = mobilizee.address
-            note_list = []
-            for note in mobilizee.notes:
-                note_list.append({"content": note.content})
-            note_list.reverse()
-            mobilizee_dict["notes"] = note_list
+            #note_list = []
+            #for note in mobilizee.notes:
+             #   note_list.append({"content": note.content})
+            #note_list.reverse()
+            #mobilizee_dict["notes"] = note_list
             mobilizee_list.append(mobilizee_dict)
         return mobilizee_list
 
@@ -142,6 +158,29 @@ class TestContact(Resource):
                 "phone": mobilizee.phone,
                 "address": mobilizee.address}
 
+class SeeRemovalRequests(Resource):
+    def get(self):
+        requests = Request.query.all()
+
+        request_list = []
+        for request in requests:
+            request_list.append(request.mobilizee_id)
+        mobilizees = Mobilizee.query.filter(Mobilizee.mobilizee_id.in_(request_list)).all()
+        mobilizee_list = []
+        for mobilizee in mobilizees:
+            mobilizee_dict = {}
+            mobilizee_dict["id"] = mobilizee.mobilizee_id
+            mobilizee_dict['name'] = mobilizee.fname + " " + mobilizee.lname
+            mobilizee_dict["phone"] = mobilizee.phone
+            mobilizee_dict["email"] = mobilizee.email
+            mobilizee_dict["address"] = mobilizee.address
+            # note_list = []
+            # for note in mobilizee.notes:
+            #   note_list.append({"content": note.content})
+            # note_list.reverse()
+            # mobilizee_dict["notes"] = note_list
+            mobilizee_list.append(mobilizee_dict)
+        return mobilizee_list
 class AssignMobilizees(Resource):
     def post(self):
         # UPDATE DOESN'T PERSIST AFTER ASSIGNMENT?

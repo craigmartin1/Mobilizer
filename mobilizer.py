@@ -42,6 +42,7 @@ api.add_resource(resources.RemoveMobilizee, '/coordinator/remove_mobilizee')
 api.add_resource(resources.DeleteMobilizee, '/coordinator/delete_mobilizee')
 api.add_resource(resources.UnattachedMobilizees, '/coordinator/unattached_mobilizees')
 api.add_resource(resources.SeeMobilizers, '/coordinator/see_mobilizers')
+api.add_resource(resources.SeeRemovalRequests, '/coordinator/see_removal_requests')
 api.add_resource(resources.Login, '/login')
 
 @app.cli.command('initdb')
@@ -77,6 +78,23 @@ def initdb_command():
                                 '5103044524',
                                 1
                             );""")
+    con.execute("""INSERT INTO mobilizee
+                                VALUES (
+                                    2,
+                                    'Larstname',
+                                     'Fistname2',
+                                     'testing2@gmail.com',
+                                    '5103044524',
+                                    '123 Real Avenue',
+                                    -1
+                                );""")
+
+    con.execute("""INSERT INTO request
+                                VALUES (
+                                    1,
+                                    2,
+                                    1
+                                );""")
 
 
 

@@ -50,13 +50,14 @@ class Mobilizee(db.Model):
     notes = db.relationship("Note", backref="mobilizee")
     mobilizer_id = db.Column(db.Integer, db.ForeignKey('mobilizer.mobilizer_id'))
 
-    def __init__(self, lname, fname, email, phone, address):
+    def __init__(self, lname, fname, email, phone, address, mobilizer_id=None):
         self.lname = lname
         self.fname = fname
         self.email = email
         self.phone = phone
         self.address = address
         self.notes = []
+        self.mobilizer_id = mobilizer_id
 
     def __repr__(self):
         return '<Mobilizee {}>'.format(self.mobilizer_id)
