@@ -4,7 +4,10 @@ import './App.css';
 import Mobilizees from './components/Mobilizees/Mobilizees';
 import Mobilizers from './components/Mobilizers/Mobilizers';
 import Coordinator from './components/Coordinator/coordinator';
+import UpdateForm from './components/Mobilizees/UpdateForm';
+import PasswordForm from './components/Mobilizers/PasswordForm';
 import User from './components/User/User';
+import * as queryString from 'query-string';
 import axios from 'axios';
 
 class App extends Component {
@@ -81,8 +84,10 @@ class App extends Component {
               <Coordinator mobilizers={this.state.mobilizers} mobilizees={this.state.mobilizees} removal_requests={this.state.removal_requests} />
             )} />
           <Route path="/mobilizer" render={(props) => (
-              <User mobilizees={this.state.mobilizees} />
+              <User mobilizees={this.state.mobilizees} id="1" />
             )} />
+          <Route path="/update" render = {(props) => (<UpdateForm id={props.location.state.id} name={props.location.state.name} email={props.location.state.email} phone={props.location.state.phone} address={props.location.state.address} submit_function={this.submitUpdateHandler} />)}/>
+          <Route path="/change_password" render = {(props) => (<PasswordForm id={props.location.state.id} />)} />
         </div>
         </BrowserRouter>
       );

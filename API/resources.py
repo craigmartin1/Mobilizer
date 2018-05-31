@@ -32,6 +32,7 @@ update_parser.add_argument('mobilizee_id', help='This field cannot be blank', re
 update_parser.add_argument('email', help='This field can be blank', required=False)
 update_parser.add_argument('phone', help='This field can be blank', required=False)
 update_parser.add_argument('address', help='This field can be blank', required=False)
+update_parser.add_argument('name', help='This field can be blank', required=False)
 
 assign_parser = reqparse.RequestParser()
 assign_parser.add_argument('mobilizer_id', help='This field cannot be blank', required=True)
@@ -46,6 +47,7 @@ register_mobilizer_parser.add_argument('phone', help='This field cannot be blank
 
 password_parser = reqparse.RequestParser()
 password_parser.add_argument('password', help='This field cannot be blank', required=True)
+password_parser.add_argument('mobilizer_id', help='This field cannot be blank', required=True)
 
 register_mobilizee_parser = reqparse.RequestParser()
 register_mobilizee_parser.add_argument('fname')
@@ -136,6 +138,7 @@ class RequestRemoval(Resource):
 class UpdateContact(Resource):
     def post(self):
         data = update_parser.parse_args()
+        name = data["name"]
         email = data["email"]
         phone = data["phone"]
         address = data["address"]
@@ -147,6 +150,8 @@ class UpdateContact(Resource):
             mobilizee.phone = phone
         if(address):
             mobilizee.address = address
+        if(name):
+            mobilizee.name = name
         db.session.commit()
         return {"Message": "Contact updated"}
 
@@ -213,7 +218,7 @@ class RegisterMobilizer(Resource):
 class ChangePasswordMobilizer(Resource):
     def post(self):
         data = password_parser.parse_args()
-        mobilizer_id = session["mobilizer_id"]
+        mobilizer_id = data["mobilizer_id"]
         new_password = data["password"]
         mobilizer = Mobilizer.query.filter(Mobilizer.mobilizer_id==mobilizer_id).first()
         mobilizer.password = Mobilizer.generate_hash(new_password)

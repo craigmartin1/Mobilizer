@@ -5,17 +5,16 @@ import { BrowserRouter, Route, Link, withRouter } from 'react-router-dom';
 import axios from 'axios';
 
 const user = (props) => {
-
+	console.log(props.id)
 	const removeMobilizeeHandler = (id) =>{
-    axios.post('/mobilizer/removal', {mobilizee_id:id}).catch(error => {
-          console.log(error);
-        });
+    
     }
 
 
 	return (
         <div>
          <Mobilizees mobilizees={props.mobilizees} removal_function={removeMobilizeeHandler} />
+         <p><Link to={{ pathname:"/change_password", state: {id: props.id} }}>Change Password</Link></p>
         </div>
        
 		)

@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import './Mobilizee.css';
 
 const mobilizee = (props) => {
@@ -31,7 +32,9 @@ const mobilizee = (props) => {
 			</select>	
 		);
 	}
-
+	const UpdateLink = (props) =>{
+		return
+	}
 	return (
 
 		<div className="Mobilizee">
@@ -40,7 +43,8 @@ const mobilizee = (props) => {
 			<p>{props.email}</p>
 			<p>{props.phone}</p>
 			<button onClick={props.removal_function}>Remove</button>
-			{are_there_mobilizers ? <Dropdown mobilizers={props.mobilizers} change_function = {handleChange}/> : ''}
+			{are_there_mobilizers ? <Dropdown mobilizers={props.mobilizers} change_function = {handleChange}/> : <p><Link to={{ pathname:"/update", state: {id: props.id, name: props.name, email: props.email, phone: props.phone, address: props.address} }}>Update Contact</Link></p>}
+			
 			<p>{props.notes}</p>
 		</div>
 		

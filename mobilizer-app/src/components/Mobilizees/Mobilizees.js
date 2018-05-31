@@ -12,7 +12,8 @@ const mobilizees = (props) => props.mobilizees.map((mobilizee, index) => {
 		notes = {mobilizee.notes}
 		removal_function = {() => props.removal_function(mobilizee.id)}
 		assign_function = {props.assign_function}
-		mobilizers = {props.mobilizers} />
+		mobilizers = {props.mobilizers}
+		 />
 });
 
 export default mobilizees;
