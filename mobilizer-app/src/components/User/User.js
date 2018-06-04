@@ -5,7 +5,6 @@ import { BrowserRouter, Route, Link, withRouter } from 'react-router-dom';
 import axios from 'axios';
 
 const user = (props) => {
-	console.log(props.id)
 	const removeMobilizeeHandler = (id) =>{
     
     }

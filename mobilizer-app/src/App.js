@@ -6,6 +6,8 @@ import Mobilizers from './components/Mobilizers/Mobilizers';
 import Coordinator from './components/Coordinator/coordinator';
 import UpdateForm from './components/Mobilizees/UpdateForm';
 import PasswordForm from './components/Mobilizers/PasswordForm';
+import MobilizerForm from './components/Mobilizers/MobilizerForm';
+import MobilizeeForm from './components/Mobilizees/MobilizeeForm';
 import User from './components/User/User';
 import * as queryString from 'query-string';
 import axios from 'axios';
@@ -57,6 +59,7 @@ class App extends Component {
     //role: props.role,
     //get mobilizer,mobilizee content from server here, test data below
     role: "coordinator",
+    user_id: 1,
     mobilizers: [
       {id: 1, name: "Test1", phone: '555-555-5555', email: 'test@gmail.com'},
       {id: 2, name: "Test2", phone: '222-555-5555', email: 'test2@gmail.com'},
@@ -88,6 +91,9 @@ class App extends Component {
             )} />
           <Route path="/update" render = {(props) => (<UpdateForm id={props.location.state.id} name={props.location.state.name} email={props.location.state.email} phone={props.location.state.phone} address={props.location.state.address} submit_function={this.submitUpdateHandler} />)}/>
           <Route path="/change_password" render = {(props) => (<PasswordForm id={props.location.state.id} />)} />
+          <Route path="/register_mobilizer" render = {(props) => (<MobilizerForm id={this.state.user_id} /> )} />
+          <Route path="/register_mobilizee" render = {(props) => (<MobilizeeForm />) } />
+          <Route path="/mass_register" render = {(props) => (<div>Alright</div>)} />
         </div>
         </BrowserRouter>
       );

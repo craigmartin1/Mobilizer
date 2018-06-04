@@ -44,6 +44,7 @@ register_mobilizer_parser.add_argument('username', help='This field cannot be bl
 register_mobilizer_parser.add_argument('password', help='This field cannot be blank', required=True)
 register_mobilizer_parser.add_argument('email', help='This field cannot be blank', required=True)
 register_mobilizer_parser.add_argument('phone', help='This field cannot be blank', required=True)
+register_mobilizer_parser.add_argument('coordinator_id', help='This field cannot be blank', required=True)
 
 password_parser = reqparse.RequestParser()
 password_parser.add_argument('password', help='This field cannot be blank', required=True)
@@ -204,7 +205,7 @@ class RegisterMobilizer(Resource):
         name = data["name"]
         username = data["username"]
         password = Mobilizer.generate_hash(data["password"])
-        coordinator_id = session["coordinator_id"]
+        coordinator_id = data["coordinator_id"]
         email = data["email"]
         phone = data["phone"]
         coordinator = Coordinator.query.filter(Coordinator.coordinator_id==coordinator_id).first()
